@@ -47,7 +47,8 @@ int main (int argc, char **argv)
             string message;
             cout << "please input the message:\n";
             getline(cin, message);
-            pvd(buffer, message, format, method);
+            //pvd(buffer, message, format, method);
+            DFT_LSB(buffer, message);
 
             if(format == 1)
                 bmp_write(buffer, argv[3]);

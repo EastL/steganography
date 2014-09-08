@@ -1,9 +1,11 @@
 #include <string>
 #include <vector>
+#include <complex>
 #define header_size 32
 
 using std::string;
 using std::vector;
+using std::complex;
 
 string short2bin(short n);  //short to binary
 short bin2short(string str);//binary to short
@@ -21,3 +23,9 @@ short lsb(short cover, string message);
 short matrix_embbeding(short cover, string message);
 
 string retrieve_pvd(vector<short> buffer, short format, short method);
+
+complex<short> *DFT(short *input, int size);//discrete fourier transform 
+
+void *IDFT(complex<short> *input, int size, vector<short> &buffer);//inverse discrete fourier transform
+
+void DFT_LSB(vector<short> &buffer, string str);

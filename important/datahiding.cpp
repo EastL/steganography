@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include "datahiding.h"
+#define pi 3.14159
 
 using std::cin;
 using std::cout;
@@ -28,7 +29,7 @@ string short2bin(short n)
 string Tobinary(string str)
 {
     string binary;
-    for(int i = 0; i < str.size(); i++)
+    /*for(int i = 0; i < str.size(); i++)
     {
         bool temp[8] = {0, 0, 0, 0, 0, 0, 0, 0};
         int make = str[i];
@@ -47,6 +48,13 @@ string Tobinary(string str)
 
     for(int i = 0; i < binary.size(); i++)
         binary[i] += 48;
+    */
+    for(int i = 0; i < str.size(); i++)
+    {
+        for(int j = 7; j >= 0; j--)
+            binary.push_back(str[i] & (1 << j) ? '1': '0');
+    }
+
     return binary;
 }
 
@@ -825,24 +833,78 @@ string retrieve_pvd(vector<short> buffer, short format, short method)
     }
     return message;
 }
+
+complex<short> *DFT(vector<short> input, int size)
+{
+    complex<short> *output = (complex<short> *)malloc(size * sizeof(complex<short>));
+
+    for(int i = 0; i < size; i++)
+    {
+        short real = 0, image = 0;
+        for(int j = 0; j < size; j++)
+        {
+            real += input[j] * cos( -2 * pi * i * j / size);
+            image += input[j] * sin(-2 * pi * i * j / size);
+        }
+
+        output[i] = complex<short>(real, image);
+    }
+    return output;
+}
+
+void *IDFT(complex<short> *input, int size, vector<short> &buffer)
+{
+    short *output = (short *)malloc(size * sizeof(short));
+
+    for(int i = 0; i < size; i++)
+    {
+        short real = 0, image = 0;
+        complex<short> Complex(0, 0);
+        for(int j = 0; j < size; j++)
+        {
+            real = cos(2* pi * i * j / size);
+            image = sin(2* pi * i * j / size);
+            Complex += complex<short>(real, image) * input[j];
+        }
+
+        output[i] = Complex.real()/size;
+    }
+}
+
+void DFT_LSB(vector<short> &buffer, string str)
+{
+    int test = 100;//buffer.size();
+    string bin = Tobinary(str);
+    complex<short> *dft_string = (complex<short> *)malloc(test * sizeof(complex<short>));
+
+    dft_string = DFT(buffer, test);
+    for(int i = 0; i < bin.size(); i++)
+    {
+       string str;
+       str.push_back(bin[i]);
+       dft_string[i] = complex<short>(lsb(dft_string[i].real(), str), dft_string[i].imag());  
+    }
+   
+}
 /*
 int main()
 {
-    vector<short> a;
-    for(int i = 0; i < 100; i+=10)
-        a.push_back(i);
-    for(int i = 0; i < 1000; i += 100)
-        a.push_back(i);
-    for(int i = 0; i < 100; i+=10)
-       a.push_back(i);
-    string m;
-    cin >> m;
-    pvd(a,m,1,2);
+    short *a = (short *)malloc(20*sizeof(short));
+    for(int i = 0; i < 8; i++)
+       cin >> a[i];
 
+    cout << endl;
+    complex<short> *O = DFT(a, 8);
+    for(int i = 0; i < 8; i++)
+        cout << O[i];
 
-   short a;
-   string b;
-   cin >> a >> b;
-   a = get_better(a, b);
-   cout << a;
+    cout << endl;
+    
+
+    string a;
+    cin >> a;
+
+    vector<short> b;
+    DFT_LSB(b, a);
+    return 0;
 }*/
