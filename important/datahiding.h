@@ -26,6 +26,6 @@ string retrieve_pvd(vector<short> buffer, short format, short method);
 
 complex<short> *DFT(short *input, int size);//discrete fourier transform 
 
-void *IDFT(complex<short> *input, int size, vector<short> &buffer);//inverse discrete fourier transform
+vector<short> IDFT(complex<short> *input, int size, vector<short> &buffer);//inverse discrete fourier transform
 
 void DFT_LSB(vector<short> &buffer, string str);

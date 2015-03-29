@@ -843,8 +843,8 @@ complex<short> *DFT(vector<short> input, int size)
         short real = 0, image = 0;
         for(int j = 0; j < size; j++)
         {
-            real += input[j] * cos( -2 * pi * i * j / size);
-            image += input[j] * sin(-2 * pi * i * j / size);
+            real += input[j] * cos(2 * pi * i * j / size);
+            image += input[j] * sin(2 * pi * i * j / size);
         }
 
         output[i] = complex<short>(real, image);
@@ -852,9 +852,10 @@ complex<short> *DFT(vector<short> input, int size)
     return output;
 }
 
-void *IDFT(complex<short> *input, int size, vector<short> &buffer)
+vector<short> IDFT(complex<short> *input, int size)
 {
-    short *output = (short *)malloc(size * sizeof(short));
+    //short *output = (short *)malloc(size * sizeof(short));
+    vector<short> output;
 
     for(int i = 0; i < size; i++)
     {
@@ -867,23 +868,34 @@ void *IDFT(complex<short> *input, int size, vector<short> &buffer)
             Complex += complex<short>(real, image) * input[j];
         }
 
-        output[i] = Complex.real()/size;
+        output.push_back(Complex.real()/size);
     }
+    return output;
 }
 
 void DFT_LSB(vector<short> &buffer, string str)
 {
-    int test = 100;//buffer.size();
+    //int test = 100;//buffer.size();
     string bin = Tobinary(str);
-    complex<short> *dft_string = (complex<short> *)malloc(test * sizeof(complex<short>));
+    complex<short> *dft_string = (complex<short> *)malloc(buffer.size() * sizeof(complex<short>));
 
-    dft_string = DFT(buffer, test);
-    for(int i = 0; i < bin.size(); i++)
+    for(int i = 0; i < buffer.size(); i+=8)
+    {
+        vector<short> temp;
+        for(int j = i; j < i+8; j++)
+            temp.push_back(buffer[j]);
+        dft_string = DFT(temp, 8);
+        temp = IDFT(dft_string,8);
+        for(int j = i, k = 0; j < i+8 && k < 8; j++,k++)
+            buffer[j] = temp[k];
+        if(i+8 > buffer.size()) break;
+    }
+    /*for(int i = 0; i < bin.size(); i++)
     {
        string str;
        str.push_back(bin[i]);
        dft_string[i] = complex<short>(lsb(dft_string[i].real(), str), dft_string[i].imag());  
-    }
+    }*/
    
 }
 /*
